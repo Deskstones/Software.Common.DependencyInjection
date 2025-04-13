@@ -6,8 +6,6 @@ namespace DSK.Common.DependencyInjection.App
     {
         static void Main(string[] args)
         {
-            IAssemblyLoader assemblyLoader = new AssemblyLoader(); // manual instantiation
-            assemblyLoader.LoadAssembly(@"DSK.Common.DependencyInjection.App.dll");
             Console.WriteLine("donee");
         }
     }
