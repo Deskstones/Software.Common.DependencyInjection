@@ -3,7 +3,7 @@ name: Publish NuGet Package
 on:
   push:
     branches:
-      - main  # Adjust branch as needed
+      - main  # Change this if you want to trigger on a different branch
 
 jobs:
   build-and-publish:
@@ -16,34 +16,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Debug: list files in the root directory to confirm solution file exists.
+      # Optional: Debug step to confirm the solution file is in the repo root.
       - name: List root directory files
         run: ls -la
 
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Adjust this if you need to target a different .NET version
+          dotnet-version: '8.0.x'  # Adjust if targeting a different SDK version
 
-      # Restore dependencies from the correct solution file
+      # Restore dependencies using your solution file located at the repository root.
       - name: Restore dependencies
         run: dotnet restore DSK.Common.DependencyInjection.sln
 
-      # Build the solution using the correct solution file
+      # Build the solution in Release configuration.
       - name: Build solution
         run: dotnet build DSK.Common.DependencyInjection.sln --configuration Release
 
-      # Pack the project using the correct project file path
+      # Pack the project using the project file path from your repository.
       - name: Pack the project
         run: dotnet pack src/DSK.Common.DependencyInjection/DSK.Common.DependencyInjection.csproj --configuration Release --no-build -o ./nupkgs /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
-      # Debug: list generated packages to verify the .nupkg file exists
+      # Optional: List generated packages to verify that the package was created.
       - name: List generated packages
         run: ls -la ./nupkgs
 
-      # Push the NuGet package to GitHub Packages
+      # Push the NuGet package using the constructed file name.
       - name: Push NuGet package to GitHub Packages
         run: |
-          dotnet nuget push ./nupkgs/*.nupkg \
+          dotnet nuget push ./nupkgs/${{ env.PACKAGE_NAME }}.${{ env.PACKAGE_VERSION }}.nupkg \
             --source "https://nuget.pkg.github.com/Deskstones/index.json" \
-            --api-key "$NUGET_API_KEY" -v detailed
+            --api-key "$NUGET_API_KEY"
