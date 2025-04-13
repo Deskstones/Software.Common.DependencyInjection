@@ -16,27 +16,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: List repository contents for debugging
-        run: find . -type f
+      # Debug: list files in the root directory to confirm solution file exists.
+      - name: List root directory files
+        run: ls -la
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' 
+          dotnet-version: '8.0.x'  # Adjust this if you need to target a different .NET version
 
-
+      # Restore dependencies from the correct solution file
       - name: Restore dependencies
-        run: dotnet restore Software.Common.DependencyInjection.sln
+        run: dotnet restore DSK.Common.DependencyInjection.sln
 
+      # Build the solution using the correct solution file
       - name: Build solution
-        run: dotnet build Software.Common.DependencyInjection.sln --configuration Release
+        run: dotnet build DSK.Common.DependencyInjection.sln --configuration Release
 
+      # Pack the project using the correct project file path
       - name: Pack the project
         run: dotnet pack src/DSK.Common.DependencyInjection/DSK.Common.DependencyInjection.csproj --configuration Release --no-build -o ./nupkgs /p:PackageVersion=${{ env.PACKAGE_VERSION }}
 
+      # Debug: list generated packages to verify the .nupkg file exists
       - name: List generated packages
         run: ls -la ./nupkgs
 
+      # Push the NuGet package to GitHub Packages
       - name: Push NuGet package to GitHub Packages
         run: |
           dotnet nuget push ./nupkgs/*.nupkg \
